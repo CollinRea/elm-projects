@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 import Html.App as App
 
 
@@ -9,12 +10,12 @@ import Html.App as App
 
 
 type alias Model =
-    String
+    Bool
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( "Hello", Cmd.none )
+    ( False, Cmd.none )
 
 
 
@@ -22,7 +23,8 @@ init =
 
 
 type Msg
-    = NoOp
+    = Expand
+    | Collapse
 
 
 
@@ -32,8 +34,11 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        noOp ->
-            ( model, Cmd.none )
+        Expand ->
+            ( True, Cmd.none )
+
+        Collapse ->
+            ( False, Cmd.none )
 
 
 
@@ -42,42 +47,47 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    body []
-        [ div [ id "container" ]
-            [ div [ id "header" ]
-                [ h2 []
-                    [ text "Collin Rea" ]
-                , ul []
-                    [ li []
-                        [ a [ href "" ]
-                            [ text "Portfolio" ]
+    if model then
+        div []
+            [ button [ onClick Collapse ] [ text "Hide" ]
+            , body []
+                [ div [ id "container" ]
+                    [ div [ id "header" ]
+                        [ h2 []
+                            [ text "Collin Rea" ]
+                        , ul []
+                            [ li []
+                                [ a [ href "" ]
+                                    [ text "Portfolio" ]
+                                ]
+                            , li []
+                                [ a [ href "" ]
+                                    [ text "About" ]
+                                ]
+                            , li []
+                                [ a [ href "" ]
+                                    [ text "Contact" ]
+                                ]
+                            ]
                         ]
-                    , li []
-                        [ a [ href "" ]
-                            [ text "About" ]
-                        ]
-                    , li []
-                        [ a [ href "" ]
-                            [ text "Contact" ]
+                    , div [ id "content" ]
+                        [ p [ id "image" ]
+                            [ a [ href "" ]
+                                [ img [ src "mypicture" ]
+                                    []
+                                ]
+                            ]
+                        , h1 []
+                            [ text "Collin Rea" ]
+                        , p []
+                            [ text "Full Stack Web Developer" ]
                         ]
                     ]
-                ]
-            , div [ id "content" ]
-                [ p [ id "image" ]
-                    [ a [ href "" ]
-                        [ img [ src "mypicture" ]
-                            []
-                        ]
-                    ]
-                , h2 []
-                    [ text model ]
-                , h1 []
-                    [ text "Collin Rea" ]
-                , p []
-                    [ text "Full Stack Web Developer" ]
                 ]
             ]
-        ]
+    else
+        div []
+            [ button [ onClick Expand ] [ text "Show" ] ]
 
 
 
