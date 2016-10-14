@@ -2,20 +2,27 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
 import Html.App as App
+import Widget
 
 
 -- MODEL
 
 
-type alias Model =
-    Bool
+type alias AppModel =
+    { widgetModel : Widget.Model
+    }
 
 
-init : ( Model, Cmd Msg )
+initialModel : AppModel
+initialModel =
+    { widgetModel = Widget.initialModel
+    }
+
+
+init : ( AppModel, Cmd Msg )
 init =
-    ( False, Cmd.none )
+    ( initialModel, Cmd.none )
 
 
 
@@ -23,78 +30,74 @@ init =
 
 
 type Msg
-    = Expand
-    | Collapse
+    = WidgetMsg Widget.Msg
 
 
 
 -- UPDATE
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        Expand ->
-            ( True, Cmd.none )
-
-        Collapse ->
-            ( False, Cmd.none )
+update : Msg -> AppModel -> ( AppModel, Cmd Msg )
+update message model =
+    case message of
+        WidgetMsg subMsg ->
+            let
+                ( updatedWidgetModel, widgetCmd ) =
+                    Widget.update subMsg model.widgetModel
+            in
+                ( { model | widgetModel = updatedWidgetModel }, Cmd.map WidgetMsg widgetCmd )
 
 
 
 -- VIEW
 
 
-view : Model -> Html Msg
+view : AppModel -> Html Msg
 view model =
-    if model then
-        div []
-            [ button [ onClick Collapse ] [ text "Hide" ]
-            , body []
-                [ div [ id "container" ]
-                    [ div [ id "header" ]
-                        [ h2 []
-                            [ text "Collin Rea" ]
-                        , ul []
-                            [ li []
-                                [ a [ href "" ]
-                                    [ text "Portfolio" ]
-                                ]
-                            , li []
-                                [ a [ href "" ]
-                                    [ text "About" ]
-                                ]
-                            , li []
-                                [ a [ href "" ]
-                                    [ text "Contact" ]
-                                ]
-                            ]
-                        ]
-                    , div [ id "content" ]
-                        [ p [ id "image" ]
+    div []
+        [ body []
+            [ div [ id "container" ]
+                [ div [ id "header" ]
+                    [ h2 []
+                        [ text "Collin Rea" ]
+                    , ul []
+                        [ li []
                             [ a [ href "" ]
-                                [ img [ src "mypicture" ]
-                                    []
-                                ]
+                                [ text "Portfolio" ]
                             ]
-                        , h1 []
-                            [ text "Collin Rea" ]
-                        , p []
-                            [ text "Full Stack Web Developer" ]
+                        , li []
+                            [ a [ href "" ]
+                                [ text "About" ]
+                            ]
+                        , li []
+                            [ a [ href "" ]
+                                [ text "Contact" ]
+                            ]
                         ]
+                    ]
+                , div [ id "content" ]
+                    [ p [ id "image" ]
+                        [ a [ href "" ]
+                            [ img [ src "mypicture" ]
+                                []
+                            ]
+                        ]
+                    , h1 []
+                        [ text "Collin Rea" ]
+                    , p []
+                        [ text "Full Stack Web Developer" ]
                     ]
                 ]
             ]
-    else
-        div []
-            [ button [ onClick Expand ] [ text "Show" ] ]
+        , App.map WidgetMsg (Widget.view model.widgetModel)
+        ]
 
 
 
 -- SUBSCRIPTIONS
 
 
-subscriptions : Model -> Sub Msg
+subscriptions : AppModel -> Sub Msg
 subscriptions model =
     Sub.none
 

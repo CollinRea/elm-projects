@@ -1,35 +1,35 @@
 var _user$project$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
+var _user$project$Main$initialModel = {widgetModel: _user$project$Widget$initialModel};
+var _user$project$Main$init = {ctor: '_Tuple2', _0: _user$project$Main$initialModel, _1: _elm_lang$core$Platform_Cmd$none};
+var _user$project$Main$AppModel = function (a) {
+	return {widgetModel: a};
+};
+var _user$project$Main$WidgetMsg = function (a) {
+	return {ctor: 'WidgetMsg', _0: a};
+};
 var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		if (_p0.ctor === 'Expand') {
-			return {ctor: '_Tuple2', _0: true, _1: _elm_lang$core$Platform_Cmd$none};
-		} else {
-			return {ctor: '_Tuple2', _0: false, _1: _elm_lang$core$Platform_Cmd$none};
-		}
+	function (message, model) {
+		var _p0 = message;
+		var _p1 = A2(_user$project$Widget$update, _p0._0, model.widgetModel);
+		var updatedWidgetModel = _p1._0;
+		var widgetCmd = _p1._1;
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				model,
+				{widgetModel: updatedWidgetModel}),
+			_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$WidgetMsg, widgetCmd)
+		};
 	});
-var _user$project$Main$init = {ctor: '_Tuple2', _0: false, _1: _elm_lang$core$Platform_Cmd$none};
-var _user$project$Main$Collapse = {ctor: 'Collapse'};
-var _user$project$Main$Expand = {ctor: 'Expand'};
 var _user$project$Main$view = function (model) {
-	return model ? A2(
+	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
 			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
-				A2(
-				_elm_lang$html$Html$button,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Events$onClick(_user$project$Main$Collapse)
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html$text('Hide')
-					])),
 				A2(
 				_elm_lang$html$Html$body,
 				_elm_lang$core$Native_List.fromArray(
@@ -171,23 +171,11 @@ var _user$project$Main$view = function (model) {
 											]))
 									]))
 							]))
-					]))
-			])) : A2(
-		_elm_lang$html$Html$div,
-		_elm_lang$core$Native_List.fromArray(
-			[]),
-		_elm_lang$core$Native_List.fromArray(
-			[
+					])),
 				A2(
-				_elm_lang$html$Html$button,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Events$onClick(_user$project$Main$Expand)
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html$text('Show')
-					]))
+				_elm_lang$html$Html_App$map,
+				_user$project$Main$WidgetMsg,
+				_user$project$Widget$view(model.widgetModel))
 			]));
 };
 var _user$project$Main$main = {
