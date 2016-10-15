@@ -1,28 +1,23 @@
 module Main exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 import Html.App as App
-import Widget
+import Http
+import Task exposing (Task)
+import Json.Decode as Decode
 
 
 -- MODEL
 
 
-type alias AppModel =
-    { widgetModel : Widget.Model
-    }
+type alias Model =
+    String
 
 
-initialModel : AppModel
-initialModel =
-    { widgetModel = Widget.initialModel
-    }
-
-
-init : ( AppModel, Cmd Msg )
+init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.none )
+    ( "", Cmd.none )
 
 
 
@@ -30,79 +25,99 @@ init =
 
 
 type Msg
-    = WidgetMsg Widget.Msg
+    = Fetch
+    | FetchSuccess String
+    | FetchError Http.Error
 
 
 
 -- UPDATE
 
 
-update : Msg -> AppModel -> ( AppModel, Cmd Msg )
-update message model =
-    case message of
-        WidgetMsg subMsg ->
-            let
-                ( updatedWidgetModel, widgetCmd ) =
-                    Widget.update subMsg model.widgetModel
-            in
-                ( { model | widgetModel = updatedWidgetModel }, Cmd.map WidgetMsg widgetCmd )
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        Fetch ->
+            ( model, fetchCmd )
+
+        FetchSuccess name ->
+            ( name, Cmd.none )
+
+        FetchError error ->
+            ( toString error, Cmd.none )
 
 
 
 -- VIEW
 
 
-view : AppModel -> Html Msg
+view : Model -> Html Msg
 view model =
     div []
-        [ body []
-            [ div [ id "container" ]
-                [ div [ id "header" ]
-                    [ h2 []
-                        [ text "Collin Rea" ]
-                    , ul []
-                        [ li []
-                            [ a [ href "" ]
-                                [ text "Portfolio" ]
-                            ]
-                        , li []
-                            [ a [ href "" ]
-                                [ text "About" ]
-                            ]
-                        , li []
-                            [ a [ href "" ]
-                                [ text "Contact" ]
-                            ]
-                        ]
-                    ]
-                , div [ id "content" ]
-                    [ p [ id "image" ]
-                        [ a [ href "" ]
-                            [ img [ src "mypicture" ]
-                                []
-                            ]
-                        ]
-                    , h1 []
-                        [ text "Collin Rea" ]
-                    , p []
-                        [ text "Full Stack Web Developer" ]
-                    ]
-                ]
-            ]
-        , App.map WidgetMsg (Widget.view model.widgetModel)
+        [ button [ onClick Fetch ] [ text "Fetch" ]
+        , text model
         ]
 
 
+decode : Decode.Decoder String
+decode =
+    Decode.at [ "name" ] Decode.string
 
+
+url : String
+url =
+    "http://swapi.co/api/planets/1/?format=json"
+
+
+fetchTask : Task Http.Error String
+fetchTask =
+    Http.get decode url
+
+
+fetchCmd : Cmd Msg
+fetchCmd =
+    Task.perform FetchError FetchSuccess fetchTask
+
+
+
+--div []
+--    [ body []
+--        [ div [ id "container" ]
+--            [ div [ id "header" ]
+--                [ h2 []
+--                    [ text "Collin Rea" ]
+--                , ul []
+--                    [ li []
+--                        [ a [ href "" ]
+--                            [ text "Portfolio" ]
+--                        ]
+--                    , li []
+--                        [ a [ href "" ]
+--                            [ text "About" ]
+--                        ]
+--                    , li []
+--                        [ a [ href "" ]
+--                            [ text "Contact" ]
+--                        ]
+--                    ]
+--                ]
+--            , div [ id "content" ]
+--                [ p [ id "image" ]
+--                    [ a [ href "" ]
+--                        [ img [ src "mypicture" ]
+--                            []
+--                        ]
+--                    ]
+--                , h1 []
+--                    [ text "Collin Rea" ]
+--                , p []
+--                    [ text "Full Stack Web Developer" ]
+--                ]
+--            ]
+--        ]
+--    , App.map WidgetMsg (Widget.view model.widgetModel)
+--    ]
 -- SUBSCRIPTIONS
-
-
-subscriptions : AppModel -> Sub Msg
-subscriptions model =
-    Sub.none
-
-
-
 -- MAIN
 
 
@@ -112,5 +127,5 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = (always Sub.none)
         }

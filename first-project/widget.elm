@@ -1,7 +1,8 @@
 module Widget exposing (..)
 
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Html exposing (Html, div, text)
+import Mouse
+import Keyboard
 
 
 -- MODEL
@@ -23,7 +24,8 @@ initialModel =
 
 
 type Msg
-    = Increase Int
+    = MouseMsg Mouse.Position
+    | KeyMsg Keyboard.KeyCode
 
 
 
@@ -33,9 +35,7 @@ type Msg
 view : Model -> Html Msg
 view model =
     div []
-        [ div [] [ text (toString model.count) ]
-        , button [ onClick (Increase 2) ] [ text "Click" ]
-        ]
+        [ text (toString model.count) ]
 
 
 
@@ -45,5 +45,20 @@ view model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        Increase number ->
-            ( { model | count = model.count + number }, Cmd.none )
+        MouseMsg position ->
+            ( { model | count = model.count + 1 }, Cmd.none )
+
+        KeyMsg code ->
+            ( { model | count = model.count + 2 }, Cmd.none )
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Mouse.clicks MouseMsg
+        , Keyboard.presses KeyMsg
+        ]
