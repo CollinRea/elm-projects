@@ -1,3 +1,9 @@
+var _user$project$View$page = function (model) {
+	return A2(
+		_elm_lang$html$Html_App$map,
+		_user$project$Messages$PlayersMsg,
+		_user$project$Players_List$view(model.players));
+};
 var _user$project$View$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -5,6 +11,6 @@ var _user$project$View$view = function (model) {
 			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
-				_elm_lang$html$Html$text(model)
+				_user$project$View$page(model)
 			]));
 };
